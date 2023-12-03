@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, ChannelType, Partials } = require('discord.js');
 const{ OpenAI } = require ('openai');
+const {uploadAttachmentsToOpenAI} = require('./file_process');
 
 const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
@@ -58,9 +59,14 @@ client.on('messageCreate', async (message) => {
                 openaiThreadId = getOpenaiThreadId(discordThreadId);
             }
             // add a new message in the thread
+            const fileIds = await uploadAttachmentsToOpenAI(message);
+            console.log ("fileIds: ", fileIds)
             const threadMessage = await openai.beta.threads.messages.create(
                  openaiThreadId,
-                { role: "user", content: message.content }
+                { 
+                    role: "user", 
+                    content: message.content,
+                    file_ids: fileIds }
               );
             //create a run
             const run = await openai.beta.threads.runs.create(
@@ -159,8 +165,7 @@ async function getAnswer(threadId, runId) {
                 reject(error);
             }
         };
-
         checkRunStatus();
     });
-}
-
+  }
+  
