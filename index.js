@@ -21,8 +21,7 @@ client.on('ready', () => { console.log('Bot is ready! Let’s go'); });
 
 authorizedChannelId = process.env.AUTHORIZEDCHANNELID.split(',');
 authorizedUserId = process.env.AUTHORIZEDUSERID.split(',');
-console.log("authorizedChannelId: ", authorizedChannelId);
-console.log("authorizedUserId: ", authorizedUserId);
+
 
 
 const threadMap = [];
