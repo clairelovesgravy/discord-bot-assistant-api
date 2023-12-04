@@ -19,8 +19,10 @@ const client = new Client({
 client.login(process.env.DISCORD_TOKEN);
 client.on('ready', () => { console.log('Bot is ready! Let’s go'); });
 
-authorizedChannelId = ['1148830641425760259'];
-authorizedUserId =['1073103866209517618'];
+authorizedChannelId = process.env.AUTHORIZEDCHANNELID.split(',');
+authorizedUserId = process.env.AUTHORIZEDUSERID.split(',');
+console.log("authorizedChannelId: ", authorizedChannelId);
+console.log("authorizedUserId: ", authorizedUserId);
 
 
 const threadMap = [];
@@ -45,7 +47,7 @@ client.on('messageCreate', async (message) => {
         if (message.author.bot) return;
 
         // Respond to every message in DM
-        if (message.channel.type === ChannelType.DM && message.author.id.includes(authorizedUserId)) 
+        if (message.channel.type === ChannelType.DM && authorizedUserId.includes(message.author.id)) 
         {
             message.reply(`Hey there! How can I help you?`);
             // generate response from openai api
@@ -86,8 +88,10 @@ client.on('messageCreate', async (message) => {
             }
         }
 
+
+
         // In guild channels, check if the bot is mentioned
-        if (message.channel.type === ChannelType.GuildText && message.channelId.includes(authorizedChannelId)) {
+        if (message.channel.type === ChannelType.GuildText && authorizedChannelId.includes(message.channelId)) {
             if(!message.mentions.users.has(client.user.id))
                 return;
             // Respond only if the bot is mentioned

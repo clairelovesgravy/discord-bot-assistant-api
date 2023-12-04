@@ -6,7 +6,7 @@ const stream = require('stream');
 
 const openai = new OpenAI(process.env.OPENAI_API_KEY);
 
-const finished = util.promisify(stream.finished); // 用于等待流完成
+const finished = util.promisify(stream.finished); // warting for the stream to finish
 
 async function uploadAttachmentsToOpenAI(message) {
     const attachments = message.attachments;
@@ -21,7 +21,7 @@ async function uploadAttachmentsToOpenAI(message) {
             const writer = fs.createWriteStream(path);
 
             response.data.pipe(writer);
-            await finished(writer); // 等待文件写入完成
+            await finished(writer); // wait for the file to be written
 
             return path;
         })
@@ -32,10 +32,10 @@ async function uploadAttachmentsToOpenAI(message) {
         try {
             const openaiFile = await openai.files.create({
                 file: fs.createReadStream(file),
-                purpose: "assistants", // 确保这里的 purpose 值是正确的
+                purpose: "assistants", 
             });
             fileIds.push(openaiFile.id);
-            fs.unlinkSync(file); // 删除临时文件
+            fs.unlinkSync(file); // delete temp file
         } catch (error) {
             console.error("Error uploading file to OpenAI: ", error);
         }
