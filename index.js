@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { Client, GatewayIntentBits, ChannelType, Partials } = require('discord.js');
 const{ OpenAI } = require ('openai');
+const { getOpenaiThreadId, addThreadToMap } = require('./model');
 const {uploadAttachmentsToOpenAI} = require('./file_process');
 
 const openai = new OpenAI(process.env.OPENAI_API_KEY);
@@ -23,24 +24,6 @@ authorizedChannelId = process.env.AUTHORIZEDCHANNELID.split(',');
 authorizedUserId = process.env.AUTHORIZEDUSERID.split(',');
 
 
-
-const threadMap = [];
-function getOpenaiThreadId(discordThreadId) {
-    for (const mapping of threadMap) {
-        if (mapping.discordThreadId === discordThreadId) {
-            return mapping.openaiThreadId;
-        }
-    }
-    return null; // or any other appropriate value indicating 'not found'
-}
-
-function addThreadToMap(discordThreadId, openaiThreadId) {
-    // Optional: Add validation for discordThreadId and openaiThreadId
-    threadMap.push({ discordThreadId, openaiThreadId });
-}
-
-
-
 client.on('messageCreate', async (message) => {
     try {
         if (message.author.bot) return;
@@ -48,7 +31,6 @@ client.on('messageCreate', async (message) => {
         // Respond to every message in DM
         if (message.channel.type === ChannelType.DM && authorizedUserId.includes(message.author.id)) 
         {
-            message.reply(`Hey there! How can I help you?`);
             // generate response from openai api
             // create a thread and fetch the thread id
             const discordThreadId = message.author.id;
